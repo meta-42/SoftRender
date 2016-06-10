@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.c" />
+    <ClCompile Include="camera.c" />
+    <ClCompile Include="inputdev.c" />
+    <ClCompile Include="light.c" />
+    <ClCompile Include="matrix.c" />
+    <ClCompile Include="memory.c" />
+    <ClCompile Include="mesh.c" />
+    <ClCompile Include="mre.c" />
+    <ClCompile Include="renderdev.c" />
+    <ClCompile Include="texture.c" />
+    <ClCompile Include="vector.c" />
+    <ClCompile Include="vertex.c" />
+    <ClCompile Include="window.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="camera.h" />
+    <ClInclude Include="inputdev.h" />
+    <ClInclude Include="light.h" />
+    <ClInclude Include="matrix.h" />
+    <ClInclude Include="memory.h" />
+    <ClInclude Include="mesh.h" />
+    <ClInclude Include="mre.h" />
+    <ClInclude Include="renderdev.h" />
+    <ClInclude Include="texture.h" />
+    <ClInclude Include="types.h" />
+    <ClInclude Include="utile.h" />
+    <ClInclude Include="vector.h" />
+    <ClInclude Include="vertex.h" />
+    <ClInclude Include="window.h" />
+  </ItemGroup>
+</Project>
