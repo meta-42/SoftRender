@@ -48,6 +48,16 @@ void vector4_cross(Vector4* outv, const Vector4* v1, const Vector4* v2)
 	outv->w = 1.0f;
 }
 
+Vector4 vector4_one()
+{
+	Vector4 outv;
+	outv.x = 1.f;
+	outv.y = 1.f;
+	outv.z = 1.f;
+	outv.w = 1.f;
+	return outv;
+}
+
 void vector4_div(Vector4* outv, float x)
 {
 	float inv = 1.0f / x;
@@ -57,6 +67,12 @@ void vector4_div(Vector4* outv, float x)
 	outv->w = 1.0f;
 }
 
+//ÐÐÏòÁ¿×ó³Ë¾ØÕó
+/*
+[00 01 02]
+[x,y,z]	[10 11 12] = [x00+y10+z20, x01+y11+z21, x02+y12+z22]
+[20 21 22]
+*/
 void vector4_mul(Vector4* outv, const Vector4* v, const Matrix44* m)
 {
 	float x = v->x * m->m[0][0] + v->y * m->m[1][0] + v->z * m->m[2][0] + v->w * m->m[3][0];
@@ -85,6 +101,16 @@ void vector4_rhw(Vector4* outv, const Vector4* v)
 	outv->y = v->y * rhw;
 	outv->z = v->z * rhw;
 	outv->w = 1.0f;
+}
+
+void vector3_mul(Vector3* outv, const Vector3* v, const Matrix44* m)
+{
+	float x = v->x * m->m[0][0] + v->y * m->m[1][0] + v->z * m->m[2][0] + 1.f * m->m[3][0];
+	float y = v->x * m->m[0][1] + v->y * m->m[1][1] + v->z * m->m[2][1] + 1.f * m->m[3][1];
+	float z = v->x * m->m[0][2] + v->y * m->m[1][2] + v->z * m->m[2][2] + 1.f * m->m[3][2];
+	outv->x = x;
+	outv->y = y;
+	outv->z = z;
 }
 
 float vector3_length(const Vector3* v)
@@ -130,6 +156,14 @@ void vector3_cross(Vector3* outv, const Vector3* v1, const Vector3* v2)
 	outv->x = v1->y * v2->z - v1->z * v2->y;
 	outv->y = v1->z * v2->x - v1->x * v2->z;
 	outv->z = v1->x * v2->y - v1->y * v2->x;
+}
+
+void vector3_div(Vector4* outv, float x)
+{
+	float inv = 1.0f / x;
+	outv->x *= inv;
+	outv->y *= inv;
+	outv->z *= inv;
 }
 
 Vector3 vector3_zero()

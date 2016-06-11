@@ -151,9 +151,31 @@ void mesh_load(Mesh* mesh, char* fillename)
 		mclose(memory);
 	}
 	
-	
+	mesh_gen_face_normals(mesh);
 	printf("Vertices num = %d\n", mesh->n_vertex);
 	printf("Face num = %d\n", mesh->n_face);
+}
+
+void mesh_gen_face_normals(Mesh* mesh)
+{
+	for (int i = 0; i < mesh->n_face; i++)
+	{
+		Face face = mesh->faces[i];
+		if (mesh->normals == NULL)
+		{
+			return;
+		}
+		Vector3 veca = mesh->normals[face.normal_index[0]-1];
+		Vector3 vecb = mesh->normals[face.normal_index[1]-1];
+		Vector3 vecc = mesh->normals[face.normal_index[2]-1];
+
+		Vector3 nor;
+		vector3_add(&nor, &veca, &vecb);
+		vector3_add(&nor, &nor, &vecc);
+		vector3_div(&nor, 3);
+		vector3_normalize(&nor);
+		mesh->faces[i].normal = nor;
+	}
 }
 
 void mesh_set_position(Mesh* mesh, Vector3 pos)

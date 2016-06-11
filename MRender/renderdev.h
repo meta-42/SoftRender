@@ -24,12 +24,15 @@ typedef struct
 
 	Camera camera;
 
+	Light light;
+
 } Renderdev;
 
 void renderdev_init(Renderdev* device, int width, int height, void* fb);
 void renderdev_clear(Renderdev* device);
 void renderdev_draw_mesh(Renderdev* device, Mesh mesh);
 
+void renderdev_set_light(Renderdev* device, Light light);
 void renderdev_set_camera(Renderdev* device, Camera camera);
 void renderdev_update_transform(Renderdev* device);
 
@@ -49,5 +52,5 @@ void renderdev_project_viewport(Renderdev* device, Vector4* outv, const Vector4*
 UINT32 renderdev_texture_sample(const Renderdev* device, float u, float v);
 void renderdev_set_texture(Renderdev* device, void* bits, long pitch, int w, int h);
 
-Vertex vertex_shader(Vertex vx, const Renderdev* device);
-UINT32 fragment_shader(Vertex vx, const Renderdev* device);
+Vertex vertex_shader(Vertex vx, Renderdev* device);
+UINT32 fragment_shader(Vertex vx, Renderdev* device);

@@ -22,7 +22,7 @@ int main(void)
 
 void start()
 {
-	//创建相机
+	//相机
 	float aspect = (float)screen_width / (float)screen_height;
 	float fovy = 3.14 / 2.f;
 	float clip_near = 1.f;
@@ -31,33 +31,38 @@ void start()
 	Vector3 eye = { 0.f,0.f,-1.f }, lookat = { 0.f, 0.f, 0.f }, up = { 0.f, 1.f,0.f };
 	camera_lookat(&camera, eye, lookat, up);
 	renderdev_set_camera(&mre.renderdev, camera);
+	Vector3 camera_pos = vector3_zero();
+	camera_pos.z = -2;
+	camera_set_position(&camera, camera_pos);
 
-	//创建mesh
+	//mesh
 	mesh = *mesh_create("mono.obj", "mono.bmp");
 	Vector3 position = vector3_zero();
 	mesh_set_position(&mesh, position);
 	Vector3 rotation = vector3_zero();
 	mesh_set_rotation(&mesh, rotation);
 
-	//控制相机
-	Vector3 camera_pos = vector3_zero();
-	camera_pos.z = -2;
-	camera_set_position(&camera, camera_pos);
 
-	mre.renderdev.render_state = RENDER_STATE_TEXTURE;
+	//灯光
+	Vector3 position2 = { 0, 10,10 };
+	Color col = { 1,1,1 };
+	Light light = *light_create_point(col, position2);
+	renderdev_set_light(&mre.renderdev, light);
+
+	mre.renderdev.render_state = RENDER_STATE_COLOR;
 }
 
 float x = 1;
-float y = 1;
+float y = 0;
 void tick(float time_delta)
 {
-	//printf("%f", time_delta);
-	if (mre.window.keys[VK_LEFT])	x += time_delta * 0.1f;
-	if (mre.window.keys[VK_RIGHT])	x -= time_delta * 0.1f;
-	if (mre.window.keys[VK_UP])		y -= time_delta * 0.1f;
-	if (mre.window.keys[VK_DOWN])	y += time_delta * 0.1f;
 
-	Vector3 rotation = { 0, x, 0 };
+	if (mre.window.keys[VK_LEFT])	x +=  0.02f;
+	if (mre.window.keys[VK_RIGHT])	x -=  0.02f;
+	if (mre.window.keys[VK_UP])		y -=  0.02f;
+	if (mre.window.keys[VK_DOWN])	y +=  0.02f;
+
+	Vector3 rotation = {x, 0, 0};
 	mesh_set_rotation(&mesh, rotation);
 
 	Vector3 position = vector3_zero();

@@ -31,6 +31,7 @@ typedef struct
 	int vertex_index[3];
 	int texcoord_index[3];
 	int normal_index[3];
+	Vector3 normal;
 }Face;
 
 typedef struct
@@ -97,5 +98,25 @@ typedef struct
 	Texcoord texcoord;
 	Color col;
 	float rhw;					//Reciprocal of Homogeneous W
+	Vector3 normal;
+	Vector3 pos_world;
 } Vertex;
 
+enum
+{
+	LIGHT_DIRECTIONAL = 0,
+	LIGHT_POINT = 1,
+	LIGHT_SPOT = 2
+};
+
+typedef struct
+{
+	unsigned char light_type;
+
+	Color	color;
+
+	Vector3	direction;
+
+	Vector3	position;
+
+}Light;

@@ -20,6 +20,7 @@
 #include "texture.h"
 #include "matrix.h"
 #include "mesh.h"
+#include "light.h"
 
 #define MRE_INDEX_NONE				-1
 #define MRE_INIT_SUCCEED			0

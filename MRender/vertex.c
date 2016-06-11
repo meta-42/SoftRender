@@ -21,6 +21,7 @@ void vertex_interp(Vertex* outvx, const Vertex* vx1, const Vertex* vx2, float t)
 	outvx->col.g = interp(vx1->col.g, vx2->col.g, t);
 	outvx->col.b = interp(vx1->col.b, vx2->col.b, t);
 	outvx->rhw = interp(vx1->rhw, vx2->rhw, t);
+	outvx->rhw = interp(vx1->rhw, vx2->rhw, t);
 }
 
 void vertex_get_setp(Vertex* outvx, const Vertex* x1, const Vertex* x2, float width)

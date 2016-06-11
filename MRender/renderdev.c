@@ -89,9 +89,9 @@ void renderdev_draw_mesh(Renderdev* device, Mesh mesh)
 	{
 		Face face = mesh.faces[i];
 
-		Vertex vx1 = { { 0, 0, 0, 1 },{ 0, 0 },{ 1.f, 0.5f, 0.f }, 1 };
-		Vertex vx2 = { { 0, 0, 0, 1 },{ 0, 1 },{ 0.5f, 0.f, 1.0f }, 1 };
-		Vertex vx3 = { { 0, 0, 0, 1 },{ 1, 1 },{ 0.f, 1.f, 0.5f }, 1 };
+		Vertex vx1 = { { 0, 0, 0, 1 },{ 0, 0 },{ 0.5, 0.5, 0.5 }, 1, {0,0,0}, { 0,0,0 } };
+		Vertex vx2 = { { 0, 0, 0, 1 },{ 0, 1 },{ 0.5, 0.5, 0.5 }, 1, { 0,0,0 }, { 0,0,0 } };
+		Vertex vx3 = { { 0, 0, 0, 1 },{ 1, 1 },{ 0.5, 0.5, 0.5 }, 1, { 0,0,0 }, { 0,0,0 } };
 
 		vx1.pos.x = mesh.vertices[face.vertex_index[0] - 1].x;
 		vx1.pos.y = mesh.vertices[face.vertex_index[0] - 1].y;
@@ -105,6 +105,53 @@ void renderdev_draw_mesh(Renderdev* device, Mesh mesh)
 		vx3.pos.y = mesh.vertices[face.vertex_index[2] - 1].y;
 		vx3.pos.z = mesh.vertices[face.vertex_index[2] - 1].z;
 
+		vx1.pos_world.x = mesh.vertices[face.vertex_index[0] - 1].x;
+		vx1.pos_world.y = mesh.vertices[face.vertex_index[0] - 1].y;
+		vx1.pos_world.z = mesh.vertices[face.vertex_index[0] - 1].z;
+
+		vx2.pos_world.x = mesh.vertices[face.vertex_index[1] - 1].x;
+		vx2.pos_world.y = mesh.vertices[face.vertex_index[1] - 1].y;
+		vx2.pos_world.z = mesh.vertices[face.vertex_index[1] - 1].z;
+
+		vx3.pos_world.x = mesh.vertices[face.vertex_index[2] - 1].x;
+		vx3.pos_world.y = mesh.vertices[face.vertex_index[2] - 1].y;
+		vx3.pos_world.z = mesh.vertices[face.vertex_index[2] - 1].z;
+
+		vector3_mul(&vx1.pos_world, &vx1.pos_world, &device->world);
+		vector3_mul(&vx2.pos_world, &vx2.pos_world, &device->world);
+		vector3_mul(&vx3.pos_world, &vx3.pos_world, &device->world);
+
+
+
+		if (mesh.normals)
+		{
+			vx1.normal.x = mesh.normals[face.normal_index[0] - 1].x;
+			vx1.normal.y = mesh.normals[face.normal_index[0] - 1].y;
+			vx1.normal.z = mesh.normals[face.normal_index[0] - 1].z;
+
+			vx2.normal.x = mesh.normals[face.normal_index[1] - 1].x;
+			vx2.normal.y = mesh.normals[face.normal_index[1] - 1].y;
+			vx2.normal.z = mesh.normals[face.normal_index[1] - 1].z;
+
+			vx3.normal.x = mesh.normals[face.normal_index[2] - 1].x;
+			vx3.normal.y = mesh.normals[face.normal_index[2] - 1].y;
+			vx3.normal.z = mesh.normals[face.normal_index[2] - 1].z;
+
+			//背面裁剪，目前存在问题
+			vector3_mul(&face.normal, &face.normal, &device->world);
+			vector3_normalize(&face.normal);
+
+			Vector3 dir;
+			vector3_sub(&dir, &device->camera.position, &vx1.pos_world);
+			vector3_normalize(&dir);
+			float dot = vector3_dot(&face.normal, &dir);
+			if (dot > 0)
+			{
+				//continue;
+			}
+
+		}
+
 		if (mesh.useuv)
 		{
 			vx1.texcoord.u = mesh.texcoords[face.texcoord_index[0] - 1].u;
@@ -117,6 +164,11 @@ void renderdev_draw_mesh(Renderdev* device, Mesh mesh)
 
 		renderdev_primitive(device, &vx1, &vx2, &vx3);
 	}
+}
+
+void renderdev_set_light(Renderdev* device, Light light)
+{
+	device->light = light;
 }
 
 void renderdev_set_camera(Renderdev* device, Camera camera)
@@ -293,6 +345,7 @@ void renderdev_process_vertex(Renderdev* device, Vertex* outvx, const Vertex* vx
 {
 	Vertex temp = vertex_shader(*vx, device);
 	outvx->pos = temp.pos;
+	outvx->col = temp.col;
 }
 
 void renderdev_process_fragment(Renderdev* device, const Vertex* vx, float rhw, int x, int y)
@@ -301,16 +354,13 @@ void renderdev_process_fragment(Renderdev* device, const Vertex* vx, float rhw, 
 	float w = 1.0f / rhw;
 	if (render_state & RENDER_STATE_COLOR)
 	{
-		float r = vx->col.r * w;
-		float g = vx->col.g * w;
-		float b = vx->col.b * w;
-		int R = (int)(r * 255.0f);
-		int G = (int)(g * 255.0f);
-		int B = (int)(b * 255.0f);
-		R = clamp(R, 0, 255);
-		G = clamp(G, 0, 255);
-		B = clamp(B, 0, 255);
-		device->frameBuffer[y][x] = (R << 16) | (G << 8) | (B);
+		Vertex vxf = *vx;
+		float r = vxf.col.r * w;
+		float g = vxf.col.g * w;
+		float b = vxf.col.b * w;
+
+		UINT32 temp = fragment_shader(*vx, device);
+		device->frameBuffer[y][x] = temp;// (R << 16) | (G << 8) | (B);
 	}
 	if (render_state & RENDER_STATE_TEXTURE)
 	{
@@ -354,7 +404,6 @@ void renderdev_draw_scanline(Renderdev* device, float y, Vertex* vxa, Vertex* vx
 				//片元处理
 				renderdev_process_fragment(device, &svx, rhw, x, (int)y);
 			}
-
 		}
 		vertex_roll(&svx, &step);
 		if (x >= width) break;
@@ -446,15 +495,70 @@ void renderdev_set_texture(Renderdev* device, void* bits, long pitch, int w, int
 	device->texture_v_max = (float)(h - 1);
 }
 
-Vertex vertex_shader(Vertex vx, const Renderdev* device)
+Vertex vertex_shader(Vertex vx, Renderdev* device)
 {
+	Light light = device->light;
+
+	Vector3 light_direction;
+	vector3_sub(&light_direction, &vx.pos_world, &light.position);
+	vector3_normalize(&light_direction);
+
+	Vector3 normal;
+	vector3_mul(&normal, &vx.normal, &device->world);
+	vector3_normalize(&normal);
+
+	float ndotl = vector3_dot(&normal, &light_direction);
+	ndotl = MAX(ndotl,0 );
+
 	Vertex outvx = vx;
 	vector4_mul(&outvx.pos, &vx.pos, &device->wvp);
+
+	if (device->render_state == RENDER_STATE_COLOR)
+	{
+		outvx.col.r = ndotl * light.color.r * vx.col.r + 0.1;
+		outvx.col.g = ndotl * light.color.g * vx.col.g + 0.1;
+		outvx.col.b = ndotl * light.color.b * vx.col.b + 0.1;
+	}
+	else if (device->render_state == RENDER_STATE_TEXTURE)
+	{
+		outvx.col.r = ndotl * light.color.r;
+		outvx.col.g = ndotl * light.color.g;
+		outvx.col.b = ndotl * light.color.b;
+	}
+
 	return outvx;
 }
 
-UINT32 fragment_shader(Vertex vx, const Renderdev* device)
+UINT32 fragment_shader(Vertex vx, Renderdev* device)
 {
-	UINT32 color = renderdev_texture_sample(device, vx.texcoord.u, vx.texcoord.v);
+	float r, g, b;
+	UINT32 color;
+	if (device->render_state == RENDER_STATE_COLOR)
+	{
+		r = (int)(vx.col.r * 255.0f);
+		g = (int)(vx.col.g * 255.0f);
+		b = (int)(vx.col.b * 255.0f);
+
+		r = clamp(r, 0, 255);
+		g = clamp(g, 0, 255);
+		b = clamp(b, 0, 255);
+	}
+	else if (device->render_state == RENDER_STATE_TEXTURE)
+	{
+		color = renderdev_texture_sample(device, vx.texcoord.u, vx.texcoord.v);
+
+		r = color >> 16 & 255;
+		g = color >> 8 & 255;
+		b = color >> 0 & 255;
+
+		r = r * vx.col.r;
+		g = g * vx.col.g;
+		b = b * vx.col.b;
+
+		r = clamp(r, 0, 255);
+		g = clamp(g, 0, 255);
+		b = clamp(b, 0, 255);
+	}
+	color = ((int)r << 16) | ((int)g << 8) | ((int)b);
 	return color;
 }

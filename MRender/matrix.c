@@ -194,7 +194,6 @@ void matrix44_rotation(Matrix44* outm, float pitch, float yaw,  float roll)
 	matrix44_rotation_y(&my, yaw);
 	matrix44_rotation_z(&mz, roll);
 
-	//outMatrix = [M_RY] x [M_RX] x [M_RZ]  
 	matrix44_mul_matrix44(outm, &mx, &mz);
 	matrix44_mul_matrix44(outm, outm, &my);
 }
