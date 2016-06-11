@@ -105,9 +105,9 @@ void vector4_rhw(Vector4* outv, const Vector4* v)
 
 void vector3_mul(Vector3* outv, const Vector3* v, const Matrix44* m)
 {
-	float x = v->x * m->m[0][0] + v->y * m->m[1][0] + v->z * m->m[2][0] + 1.f * m->m[3][0];
-	float y = v->x * m->m[0][1] + v->y * m->m[1][1] + v->z * m->m[2][1] + 1.f * m->m[3][1];
-	float z = v->x * m->m[0][2] + v->y * m->m[1][2] + v->z * m->m[2][2] + 1.f * m->m[3][2];
+	float x = v->x * m->m[0][0] + v->y * m->m[1][0] + v->z * m->m[2][0];// +1.f * m->m[3][0];
+	float y = v->x * m->m[0][1] + v->y * m->m[1][1] + v->z * m->m[2][1];// +1.f * m->m[3][1];
+	float z = v->x * m->m[0][2] + v->y * m->m[1][2] + v->z * m->m[2][2];// +1.f * m->m[3][2];
 	outv->x = x;
 	outv->y = y;
 	outv->z = z;

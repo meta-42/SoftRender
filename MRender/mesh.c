@@ -105,7 +105,7 @@ void mesh_load(Mesh* mesh, char* fillename)
 				mesh->n_face++;
 				mesh->faces = (Face*)realloc(mesh->faces, mesh->n_face * sizeof(Face));
 				memcpy(&mesh->faces[mesh->n_face - 1], &face, sizeof(Face));
-				printf("f %d/%d/%d %d%/d/%d %d/%d/%d\n",
+				printf("f %d/%d/%d %d/%d/%d %d/%d/%d\n",
 					mesh->faces[mesh->n_face - 1].vertex_index[0],
 					mesh->faces[mesh->n_face - 1].texcoord_index[0],
 					mesh->faces[mesh->n_face - 1].normal_index[0],
@@ -161,10 +161,6 @@ void mesh_gen_face_normals(Mesh* mesh)
 	for (int i = 0; i < mesh->n_face; i++)
 	{
 		Face face = mesh->faces[i];
-		if (mesh->normals == NULL)
-		{
-			return;
-		}
 		Vector3 veca = mesh->normals[face.normal_index[0]-1];
 		Vector3 vecb = mesh->normals[face.normal_index[1]-1];
 		Vector3 vecc = mesh->normals[face.normal_index[2]-1];
