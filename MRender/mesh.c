@@ -158,6 +158,10 @@ void mesh_load(Mesh* mesh, char* fillename)
 
 void mesh_gen_face_normals(Mesh* mesh)
 {
+	if (mesh->normals == NULL)
+	{
+		return;
+	}
 	for (int i = 0; i < mesh->n_face; i++)
 	{
 		Face face = mesh->faces[i];

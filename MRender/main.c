@@ -49,7 +49,7 @@ void start()
 	Light light = *light_create_point(col, position2);
 	renderdev_set_light(&mre.renderdev, light);
 
-	mre.renderdev.render_state = RENDER_STATE_TEXTURE;
+	mre.renderdev.render_state = RENDER_STATE_COLOR;
 }
 
 float x = 1;
@@ -62,7 +62,7 @@ void tick(float time_delta)
 	if (mre.window.keys[VK_UP])		y -=  0.02f;
 	if (mre.window.keys[VK_DOWN])	y +=  0.02f;
 
-	Vector3 rotation = { 1, x, 0};
+	Vector3 rotation = { -1, x, 0};
 	mesh_set_rotation(&mesh, rotation);
 
 	Vector3 position = vector3_zero();

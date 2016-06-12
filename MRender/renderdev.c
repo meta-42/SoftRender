@@ -121,29 +121,6 @@ void renderdev_draw_mesh(Renderdev* device, Mesh mesh)
 		vector3_mul(&vx2.pos_world, &vx2.pos_world, &device->world);
 		vector3_mul(&vx3.pos_world, &vx3.pos_world, &device->world);
 
-		vx1.normal.x = mesh.normals[face.normal_index[0] - 1].x;
-		vx1.normal.y = mesh.normals[face.normal_index[0] - 1].y;
-		vx1.normal.z = mesh.normals[face.normal_index[0] - 1].z;
-
-		vx2.normal.x = mesh.normals[face.normal_index[1] - 1].x;
-		vx2.normal.y = mesh.normals[face.normal_index[1] - 1].y;
-		vx2.normal.z = mesh.normals[face.normal_index[1] - 1].z;
-
-		vx3.normal.x = mesh.normals[face.normal_index[2] - 1].x;
-		vx3.normal.y = mesh.normals[face.normal_index[2] - 1].y;
-		vx3.normal.z = mesh.normals[face.normal_index[2] - 1].z;
-
-		vector3_normalize(&face.normal);
-		vector3_mul(&face.normal, &face.normal, &device->world);
-		Vector3 dir;
-		vector3_sub(&dir,&vx1.pos_world, &device->camera.position);
-		vector3_normalize(&dir);
-		float dot = vector3_dot(&face.normal, &dir);
-		if (dot > 0.3)
-		{
-			continue;
-		}
-
 		if (mesh.useuv)
 		{
 			vx1.texcoord.u = mesh.texcoords[face.texcoord_index[0] - 1].u;
@@ -152,6 +129,32 @@ void renderdev_draw_mesh(Renderdev* device, Mesh mesh)
 			vx2.texcoord.v = mesh.texcoords[face.texcoord_index[1] - 1].v;
 			vx3.texcoord.u = mesh.texcoords[face.texcoord_index[2] - 1].u;
 			vx3.texcoord.v = mesh.texcoords[face.texcoord_index[2] - 1].v;;
+		}
+
+		if (mesh.normals)
+		{
+			vx1.normal.x = mesh.normals[face.normal_index[0] - 1].x;
+			vx1.normal.y = mesh.normals[face.normal_index[0] - 1].y;
+			vx1.normal.z = mesh.normals[face.normal_index[0] - 1].z;
+
+			vx2.normal.x = mesh.normals[face.normal_index[1] - 1].x;
+			vx2.normal.y = mesh.normals[face.normal_index[1] - 1].y;
+			vx2.normal.z = mesh.normals[face.normal_index[1] - 1].z;
+
+			vx3.normal.x = mesh.normals[face.normal_index[2] - 1].x;
+			vx3.normal.y = mesh.normals[face.normal_index[2] - 1].y;
+			vx3.normal.z = mesh.normals[face.normal_index[2] - 1].z;
+
+			vector3_normalize(&face.normal);
+			vector3_mul(&face.normal, &face.normal, &device->world);
+			Vector3 dir;
+			vector3_sub(&dir, &vx1.pos_world, &device->camera.position);
+			vector3_normalize(&dir);
+			float dot = vector3_dot(&face.normal, &dir);
+			if (dot > 0.4)
+			{
+				continue;
+			}
 		}
 
 		renderdev_primitive(device, &vx1, &vx2, &vx3);
