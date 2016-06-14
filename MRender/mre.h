@@ -54,7 +54,7 @@ typedef struct
 
 extern MREngine mre;
 
-int engine_init(int width, int height, const TCHAR* title);
+int engine_init(int width, int height, const TCHAR* title, HINSTANCE hinstance);
 void engine_start(AppTick tick);
 void engine_tick(float time_delta);
 void engine_fps();

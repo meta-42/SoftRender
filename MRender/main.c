@@ -8,11 +8,11 @@ int screen_width = 800, screen_height = 600;
 void tick(float time_delta);
 void start();
 
-int main(void)
+int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance, LPSTR lpcmdline, int ncmdshow)
 {
 	TCHAR* title = _T("MRenderEngine");
 
-	if (engine_init(screen_width, screen_height, title) == MRE_INIT_SUCCEED)
+	if (engine_init(screen_width, screen_height, title, hinstance) == MRE_INIT_SUCCEED)
 	{
 		start();
 		engine_start(&tick);

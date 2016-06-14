@@ -1,50 +1,42 @@
 #include "mre.h"
 
-int window_init(Window* window, int w, int h, const TCHAR* title)
+int window_init(Window* window, int w, int h, const TCHAR* title, HINSTANCE hinstance)
 {
 	window_close(window);
 
-	WNDCLASS wc =
-	{
-		CS_BYTEALIGNCLIENT,
-		(WNDPROC)window_events,
-		0,
-		0,
-		0,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		_T("SCREEN3.1415926")
-	};
+	WNDCLASSEX  winclass;
+	winclass.cbSize = sizeof(WNDCLASSEX);
+	//双击消息|DeviceContext|重绘宽|重绘高
+	winclass.style = CS_DBLCLKS | CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
+	winclass.lpfnWndProc = (WNDPROC)window_events;
+	winclass.cbClsExtra = 0;
+	winclass.cbWndExtra = 0;
+	winclass.hInstance = hinstance;
+	winclass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+	winclass.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
+	winclass.hCursor = LoadCursor(NULL, IDC_ARROW);
+	winclass.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
+	winclass.lpszClassName = "winclass";
+	winclass.lpszMenuName = NULL;
 
-	wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
-	wc.hInstance = GetModuleHandle(NULL);
-	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+	RegisterClassEx(&winclass);
 
-	if (!RegisterClass(&wc))
-	{
-		return -1;
-	}
-
-	window->handle = CreateWindow
-		(
-			_T("SCREEN3.1415926"),
-			title,
-			WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
-			0,
-			0,
-			0,
-			0,
-			NULL,
-			NULL,
-			wc.hInstance,
-			NULL
-			);
+	window->handle = CreateWindowEx(
+		NULL,								//窗口扩展样式
+		"winclass",							//类名
+		title,								//窗口标题
+		WS_OVERLAPPEDWINDOW | WS_VISIBLE,	//窗口样式
+		0, 0,								//位置
+		w, h,								//宽高
+		NULL,								//父窗口
+		NULL,								//菜单
+		hinstance,							//程序实例句柄
+		NULL								//其他参数
+		);
 
 	if (window->handle == NULL)
 	{
-		-2;
+		-1;
 	}
 
 	HDC hDC;
@@ -59,7 +51,7 @@ int window_init(Window* window, int w, int h, const TCHAR* title)
 	window->dib_cur = CreateDIBSection(window->context, &bi, DIB_RGB_COLORS, &ptr, 0, 0);
 	if (window->dib_cur == NULL)
 	{
-		return -3;
+		return -2;
 	}
 
 	window->dib_old = (HBITMAP)SelectObject(window->context, window->dib_cur);

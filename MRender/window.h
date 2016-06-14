@@ -8,7 +8,6 @@ typedef struct
 	int exit;
 	HWND handle;
 	HDC context;
-
 	unsigned char* screen_framebuf;
 
 	HBITMAP dib_cur;				//µ±Ç°Î»Í¼
@@ -16,7 +15,7 @@ typedef struct
 
 }Window;
 
-int window_init(Window* window, int w, int h, const TCHAR* title);
+int window_init(Window* window, int w, int h, const TCHAR* title, HINSTANCE hinstance);
 int window_close(Window* window);
 void window_present(Window* window);
 void window_dispatch();

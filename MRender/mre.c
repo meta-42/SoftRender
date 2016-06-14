@@ -2,14 +2,14 @@
 
 MREngine mre;
 
-int engine_init(int width, int height, const TCHAR* title)
+int engine_init(int width, int height, const TCHAR* title, HINSTANCE hinstance)
 {
 	memset(&mre, 0, sizeof(MREngine));
 
 	mre.fps = 0;
 	mre.frame_time_last = 0;
 
-	if (window_init(&mre.window, width, height, title))
+	if (window_init(&mre.window, width, height, title, hinstance))
 	{
 		printf("window init failed");
 		return -1;
