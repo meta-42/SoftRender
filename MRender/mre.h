@@ -1,11 +1,12 @@
 #pragma once
 
+#include <windows.h>
+#include <windowsx.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <tchar.h>
 #include <string.h>
-#include <windows.h>
 #include <basetsd.h>
 #include <assert.h>
 

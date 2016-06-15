@@ -8,7 +8,7 @@ int window_init(Window* window, int w, int h, const TCHAR* title, HINSTANCE hins
 	winclass.cbSize = sizeof(WNDCLASSEX);
 	//双击消息|DeviceContext|重绘宽|重绘高
 	winclass.style = CS_DBLCLKS | CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
-	winclass.lpfnWndProc = (WNDPROC)window_events;
+	winclass.lpfnWndProc = (WNDPROC)window_proc;
 	winclass.cbClsExtra = 0;
 	winclass.cbWndExtra = 0;
 	winclass.hInstance = hinstance;
@@ -58,6 +58,7 @@ int window_init(Window* window, int w, int h, const TCHAR* title, HINSTANCE hins
 	window->screen_framebuf = (unsigned char*)ptr;
 	window->width = w;
 	window->height = h;
+	window->exit = MRE_FALSE;
 
 	RECT rect = { 0, 0, w, h };
 	int wx, wy, sx, sy;
@@ -71,7 +72,6 @@ int window_init(Window* window, int w, int h, const TCHAR* title, HINSTANCE hins
 	SetWindowPos(window->handle, NULL, sx, sy, wx, wy, (SWP_NOCOPYBITS | SWP_NOZORDER | SWP_SHOWWINDOW));
 	SetForegroundWindow(window->handle);
 	ShowWindow(window->handle, SW_NORMAL);
-	window_dispatch();
 
 	memset(window->keys, 0, sizeof(int) * 512);
 	memset(window->screen_framebuf, 0, w * h * 4);
@@ -110,27 +110,41 @@ void window_present(Window* window)
 	HDC hDC = GetDC(window->handle);
 	BitBlt(hDC, 0, 0, window->width, window->height, window->context, 0, 0, SRCCOPY);
 	ReleaseDC(window->handle, hDC);
-	window_dispatch();
 }
 
 void window_dispatch(void) 
 {
 	MSG msg;
-	while (1)
+	if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 	{
-		if (!PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE)) break;
-		if (!GetMessage(&msg, NULL, 0, 0)) break;
+		if (msg.message == WM_QUIT)
+		{
+			mre.window.exit = MRE_TRUE;
+		}
+		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
 }
 
-static LRESULT window_events(HWND hWnd, UINT msg, WPARAM wParam, LRESULT lParam)
+LRESULT CALLBACK window_proc(HWND hWnd, UINT msg, WPARAM wParam, LRESULT lParam)
 {
 	switch (msg)
 	{
-		case WM_CLOSE: mre.window.exit = 1; break;
-		case WM_KEYDOWN: mre.window.keys[wParam & 511] = 1; break;
-		case WM_KEYUP: mre.window.keys[wParam & 511] = 0; break;
+		case WM_DESTROY:
+		{
+			PostQuitMessage(0);
+			break;
+		}
+		case WM_KEYDOWN:
+		{
+			mre.window.keys[wParam & 511] = 1;
+			break;
+		}
+		case WM_KEYUP: 
+		{
+			mre.window.keys[wParam & 511] = 0;
+			break;
+		}
 		default: return DefWindowProc(hWnd, msg, wParam, lParam);
 	}
 	return 0;

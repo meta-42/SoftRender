@@ -25,7 +25,7 @@ void engine_start(AppTick tick)
 {
 	mre.render_tick = tick;
 
-	while (mre.window.exit == 0 && mre.window.keys[VK_ESCAPE] == 0)
+	while (mre.window.exit == MRE_FALSE)
 	{
 		float now = (float)GetTickCount() * 0.001f;
 		float time_delta = now - mre.frame_time_last;
@@ -35,8 +35,9 @@ void engine_start(AppTick tick)
 
 void engine_tick(float time_delta)
 {
-	//处理输入
+	//处理Windows消息
 	window_dispatch();
+
 
 	//清理缓冲区
 	renderdev_clear(&mre.renderdev);

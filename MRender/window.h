@@ -19,5 +19,5 @@ int window_init(Window* window, int w, int h, const TCHAR* title, HINSTANCE hins
 int window_close(Window* window);
 void window_present(Window* window);
 void window_dispatch();
-static LRESULT window_events(HWND hWnd, UINT msg, WPARAM wParam, LRESULT lParam);
+LRESULT CALLBACK window_proc(HWND hWnd, UINT msg, WPARAM wParam, LRESULT lParam);
 
